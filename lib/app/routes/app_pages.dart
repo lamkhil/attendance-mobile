@@ -26,6 +26,19 @@ class AppPages {
       name: _Paths.HOME,
       page: () => HomeLayout(child: const HomeView()),
       binding: HomeBinding(),
+      transitionDuration: Duration.zero,
+    ),
+    GetPage(
+      name: _Paths.PROFILE,
+      page: () => HomeLayout(child: const ProfileView()),
+      transitionDuration: Duration.zero,
+      binding: ProfileBinding(),
+    ),
+    GetPage(
+      name: _Paths.HISTORY,
+      page: () => HomeLayout(child: const HistoryView()),
+      transitionDuration: Duration.zero,
+      binding: HistoryBinding(),
     ),
     GetPage(
       name: _Paths.LOGIN,
@@ -41,16 +54,6 @@ class AppPages {
       name: _Paths.SPLASHSCREEN,
       page: () => const SplashscreenView(),
       binding: SplashscreenBinding(),
-    ),
-    GetPage(
-      name: _Paths.PROFILE,
-      page: () => HomeLayout(child: const ProfileView()),
-      binding: ProfileBinding(),
-    ),
-    GetPage(
-      name: _Paths.HISTORY,
-      page: () => HomeLayout(child: const HistoryView()),
-      binding: HistoryBinding(),
     ),
   ];
 }

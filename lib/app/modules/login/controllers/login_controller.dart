@@ -26,8 +26,7 @@ class LoginController extends GetxController {
     isLoading.value = false;
 
     // Cek dummy login
-    if (emailController.text == "admin@mail.com" &&
-        passwordController.text == "123456") {
+    if (emailController.text == "123" && passwordController.text == "123") {
       Get.offAllNamed('/home');
       Get.snackbar(
         "Berhasil",
