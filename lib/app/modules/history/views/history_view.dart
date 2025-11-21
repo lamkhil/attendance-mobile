@@ -9,7 +9,6 @@ class HistoryView extends StatelessWidget {
     return Scaffold(
       body: Column(
         children: [
-          // ================= HEADER =================
           Container(
             width: double.infinity,
             padding: EdgeInsets.fromLTRB(20, 50, 20, 30),

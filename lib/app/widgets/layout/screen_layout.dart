@@ -51,6 +51,13 @@ class HomeLayout extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: child,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Get.toNamed(Routes.ABSEN);
+        },
+        backgroundColor: AppColors.BLUE_ONE,
+        child: const Icon(IconlyBold.scan, color: Colors.white),
+      ),
       bottomNavigationBar: Builder(
         builder: (context) {
           return Theme(
