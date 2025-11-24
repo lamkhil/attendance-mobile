@@ -28,17 +28,9 @@ class LoginController extends GetxController {
     // Cek dummy login
     if (emailController.text == "123" && passwordController.text == "123") {
       Get.offAllNamed('/home');
-      Get.snackbar(
-        "Berhasil",
-        "Login sukses!",
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      Get.snackbar("Berhasil", "Login sukses!");
     } else {
-      Get.snackbar(
-        "Login gagal",
-        "Email atau password salah",
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      Get.snackbar("Login gagal", "Email atau password salah");
     }
   }
 }

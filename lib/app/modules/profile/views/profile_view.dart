@@ -48,28 +48,35 @@ class ProfileView extends StatelessWidget {
           SizedBox(height: 20),
 
           // INFO CARD
-          _infoTile("Email", "lamcrut@company.com", Icons.email),
-          _infoTile("Jabatan", "Staff Administrasi", Icons.badge),
-          _infoTile("Departemen", "DPMPTSP", Icons.apartment),
-          _infoTile("Nomor HP", "0812-3456-7890", Icons.phone),
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  _infoTile("Email", "lamcrut@company.com", Icons.email),
+                  _infoTile("Jabatan", "Staff Administrasi", Icons.badge),
+                  _infoTile("Departemen", "DPMPTSP", Icons.apartment),
+                  _infoTile("Nomor HP", "0812-3456-7890", Icons.phone),
 
-          Spacer(),
-
-          // LOGOUT
-          Padding(
-            padding: EdgeInsets.all(20),
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                minimumSize: Size(double.infinity, 48),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              onPressed: () {},
-              child: Text(
-                "Logout",
-                style: TextStyle(color: Colors.white, fontSize: 16),
+                  SizedBox(height: 20),
+                  // LOGOUT
+                  Padding(
+                    padding: EdgeInsets.all(20),
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        minimumSize: Size(double.infinity, 48),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      onPressed: () {},
+                      child: Text(
+                        "Logout",
+                        style: TextStyle(color: Colors.white, fontSize: 16),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),

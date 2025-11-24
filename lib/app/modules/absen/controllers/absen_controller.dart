@@ -1,9 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:ui' as ui;
 
 import 'package:camera/camera.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class AbsenController extends GetxController {
   CameraController? cameraController;
@@ -11,6 +16,10 @@ class AbsenController extends GetxController {
   RxString base64Photo = ''.obs;
   Rx<Position?> position = Rx<Position?>(null);
   RxString timeString = ''.obs;
+  int cameraIndex = 0;
+  final cameraViewKey = GlobalKey();
+  Rx<Uint8List?> capturedImage = Rx<Uint8List?>(null);
+  Rx<Uint8List?> capturedWidget = Rx<Uint8List?>(null);
 
   @override
   void onInit() {
@@ -18,6 +27,17 @@ class AbsenController extends GetxController {
     _initCamera();
     _initLocation();
     _startClock();
+  }
+
+  Future<void> captureWidget() async {
+    RenderRepaintBoundary boundary =
+        cameraViewKey.currentContext!.findRenderObject()
+            as RenderRepaintBoundary;
+
+    ui.Image image = await boundary.toImage(pixelRatio: 3.0);
+    ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+    Uint8List pngBytes = byteData!.buffer.asUint8List();
+    capturedWidget.value = pngBytes;
   }
 
   // CLOCK
@@ -56,10 +76,15 @@ class AbsenController extends GetxController {
 
   // CAMERA
   Future<void> _initCamera() async {
+    final permissions = await [Permission.camera].request();
+    permissions.forEach((permission, status) {
+      if (!status.isGranted) {
+        Get.snackbar("Error", "Camera permission is required");
+        return;
+      }
+    });
     final cameras = await availableCameras();
-    final CameraDescription backCamera = cameras.firstWhere(
-      (c) => c.lensDirection == CameraLensDirection.back,
-    );
+    final CameraDescription backCamera = cameras.first;
 
     cameraController = CameraController(
       backCamera,
@@ -71,14 +96,31 @@ class AbsenController extends GetxController {
     isCameraReady.value = true;
   }
 
+  Future<void> switchCamera() async {
+    final cameras = await availableCameras();
+    cameraIndex = (cameraIndex + 1) % cameras.length;
+    final selectedCamera = cameras[cameraIndex];
+
+    cameraController = CameraController(
+      selectedCamera,
+      ResolutionPreset.max,
+      enableAudio: false,
+    );
+
+    await cameraController!.initialize();
+    isCameraReady.value = true;
+  }
+
   Future<void> takePicture() async {
     if (!cameraController!.value.isInitialized) return;
 
     final file = await cameraController!.takePicture();
-    final b = await File(file.path).readAsBytes();
-    base64Photo.value = base64Encode(b);
+    capturedImage.value = await file.readAsBytes();
+    await Future.delayed(Duration(milliseconds: 500));
+
+    await cameraController!.initialize();
+    await captureWidget();
   }
 
-  // UPLOAD
-  Future<void> uploadAttendance() async {}
+  Future<void> saveAttendance() async {}
 }
