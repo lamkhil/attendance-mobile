@@ -9,6 +9,7 @@ abstract class Routes {
   static const SPLASHSCREEN = _Paths.SPLASHSCREEN;
   static const PROFILE = _Paths.PROFILE;
   static const HISTORY = _Paths.HISTORY;
+  static const LOKAKARYA = _Paths.LOKAKARYA;
 }
 
 abstract class _Paths {
@@ -19,4 +20,5 @@ abstract class _Paths {
   static const SPLASHSCREEN = '/splashscreen';
   static const PROFILE = '/profile';
   static const HISTORY = '/history';
+  static const LOKAKARYA = '/';
 }

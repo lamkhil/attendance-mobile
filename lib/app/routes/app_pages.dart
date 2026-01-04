@@ -1,4 +1,3 @@
-import 'package:absensi/app/widgets/layout/screen_layout.dart';
 import 'package:get/get.dart';
 
 import '../modules/absen/bindings/absen_binding.dart';
@@ -9,10 +8,13 @@ import '../modules/home/bindings/home_binding.dart';
 import '../modules/home/views/home_view.dart';
 import '../modules/login/bindings/login_binding.dart';
 import '../modules/login/views/login_view.dart';
+import '../modules/lokakarya/bindings/lokakarya_binding.dart';
+import '../modules/lokakarya/views/lokakarya_view.dart';
 import '../modules/profile/bindings/profile_binding.dart';
 import '../modules/profile/views/profile_view.dart';
 import '../modules/splashscreen/bindings/splashscreen_binding.dart';
 import '../modules/splashscreen/views/splashscreen_view.dart';
+import '../widgets/layout/screen_layout.dart';
 
 part 'app_routes.dart';
 
@@ -54,6 +56,16 @@ class AppPages {
       name: _Paths.SPLASHSCREEN,
       page: () => const SplashscreenView(),
       binding: SplashscreenBinding(),
+    ),
+    GetPage(
+      name: _Paths.LOKAKARYA,
+      page: () => const LokakaryaView(),
+      binding: LokakaryaBinding(),
+    ),
+    GetPage(
+      name: "${_Paths.LOKAKARYA}/:id",
+      page: () => const LokakaryaView(),
+      binding: LokakaryaBinding(),
     ),
   ];
 }
