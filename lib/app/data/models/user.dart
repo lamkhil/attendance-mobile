@@ -13,6 +13,7 @@ class User {
   final DateTime? dateOfBirth;
 
   final TodayAttendance? today;
+  final CurrentShift? currentShift;
 
   User({
     required this.id,
@@ -25,6 +26,7 @@ class User {
     this.nik,
     this.dateOfBirth,
     this.today,
+    this.currentShift,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -45,6 +47,28 @@ class User {
       today: json['today'] != null
           ? TodayAttendance.fromJson(json['today'])
           : null,
+
+      currentShift: json['current_shift'] != null
+          ? CurrentShift.fromJson(json['current_shift'])
+          : null,
     );
   }
+}
+
+class CurrentShift {
+  final String start;
+  final String end;
+  final String type;
+
+  CurrentShift({required this.start, required this.end, required this.type});
+
+  factory CurrentShift.fromJson(Map<String, dynamic> json) {
+    return CurrentShift(
+      start: json['start'],
+      end: json['end'],
+      type: json['type'],
+    );
+  }
+
+  String get label => '$start - $end';
 }

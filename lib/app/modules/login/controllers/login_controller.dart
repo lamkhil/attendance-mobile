@@ -1,4 +1,5 @@
 import 'package:absensi/app/data/services/authentication_services.dart';
+import 'package:absensi/app/global/controllers/app_controller.dart';
 import 'package:absensi/app/routes/app_pages.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -35,7 +36,9 @@ class LoginController extends GetxController {
       return;
     }
 
-    _showOtpDialog();
+    Get.find<AppController>().user.value = res.data;
+    Get.offAllNamed(Routes.HOME);
+    // _showOtpDialog();
   }
 
   /* ================= OTP DIALOG ================= */
@@ -78,6 +81,8 @@ class LoginController extends GetxController {
       emailController.text,
       otpController.text,
     );
+
+    Get.find<AppController>().user.value = res.data;
 
     isLoading.value = false;
 

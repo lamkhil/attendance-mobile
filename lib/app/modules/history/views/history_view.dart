@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shimmer/shimmer.dart';
+import '../controllers/history_controller.dart';
 
-class HistoryView extends StatelessWidget {
+class HistoryView extends GetView<HistoryController> {
   const HistoryView({super.key});
 
   @override
@@ -9,63 +11,90 @@ class HistoryView extends StatelessWidget {
     return Scaffold(
       body: Column(
         children: [
+          // ================= HEADER =================
           Container(
             width: double.infinity,
-            padding: EdgeInsets.fromLTRB(20, 50, 20, 30),
-            decoration: BoxDecoration(
+            padding: const EdgeInsets.fromLTRB(20, 50, 20, 30),
+            decoration: const BoxDecoration(
               gradient: LinearGradient(
                 colors: [Color(0xFF1E3A8A), Color(0xFF3B82F6)],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
               ),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "History Kehadiran",
-                  style: TextStyle(
-                    fontSize: 24,
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(height: 10),
-                _monthDropdown(),
-              ],
+            child: const Text(
+              "History Kehadiran",
+              style: TextStyle(
+                fontSize: 24,
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
 
           // ================= LIST HISTORY =================
           Expanded(
-            child: ListView(
-              padding: EdgeInsets.all(16),
-              children: [
-                _historyCard(
-                  date: "Senin, 10 Jan 2025",
-                  masuk: "07:31",
-                  pulang: "16:28",
-                  status: "Terlambat",
+            child: controller.obx(
+              (attendances) => RefreshIndicator(
+                onRefresh: () async =>
+                    controller.fetchAttendanceHistory(reset: true),
+                child: ListView.builder(
+                  controller: controller.scrollController,
+                  padding: const EdgeInsets.all(16),
+                  itemCount: attendances!.length + 1,
+                  itemBuilder: (context, index) {
+                    if (index < attendances.length) {
+                      final a = attendances[index];
+                      return _historyCard(
+                        date: a.dateFormatted,
+                        masuk: a.checkInFormatted,
+                        pulang: a.checkOutFormatted,
+                        status: a.statusText,
+                      );
+                    } else {
+                      return controller.canLoadMore
+                          ? const Padding(
+                              padding: EdgeInsets.all(16),
+                              child: Center(child: CircularProgressIndicator()),
+                            )
+                          : const SizedBox.shrink();
+                    }
+                  },
                 ),
-                _historyCard(
-                  date: "Selasa, 11 Jan 2025",
-                  masuk: "07:25",
-                  pulang: "16:30",
-                  status: "Hadir",
+              ),
+              onLoading: _buildShimmer(),
+              onEmpty: RefreshIndicator(
+                onRefresh: () async =>
+                    controller.fetchAttendanceHistory(reset: true),
+                child: ListView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  children: [
+                    const SizedBox(height: 100),
+                    const Center(child: Text("Belum ada riwayat")),
+                    const SizedBox(height: 100),
+                    Container(
+                      padding: EdgeInsets.all(16),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          controller.fetchAttendanceHistory(reset: true);
+                        },
+                        child: const Text("Muat Ulang"),
+                      ),
+                    ),
+                  ],
                 ),
-                _historyCard(
-                  date: "Rabu, 12 Jan 2025",
-                  masuk: "-",
-                  pulang: "-",
-                  status: "Tidak Masuk",
+              ),
+              onError: (error) => RefreshIndicator(
+                onRefresh: () async =>
+                    controller.fetchAttendanceHistory(reset: true),
+                child: ListView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  children: [
+                    const SizedBox(height: 100),
+                    Center(child: Text(error ?? 'Terjadi kesalahan')),
+                  ],
                 ),
-                _historyCard(
-                  date: "Kamis, 13 Jan 2025",
-                  masuk: "-",
-                  pulang: "-",
-                  status: "Cuti",
-                ),
-              ],
+              ),
             ),
           ),
         ],
@@ -73,42 +102,7 @@ class HistoryView extends StatelessWidget {
     );
   }
 
-  // =====================================
-  // DROPDOWN FILTER BULAN
-  // =====================================
-  Widget _monthDropdown() {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 12),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          dropdownColor: Colors.blue[800],
-          iconEnabledColor: Colors.white,
-          value: "Januari 2025",
-          onChanged: (v) {},
-          items:
-              [
-                "Januari 2025",
-                "Desember 2024",
-                "November 2024",
-                "Oktober 2024",
-              ].map((item) {
-                return DropdownMenuItem(
-                  value: item,
-                  child: Text(item, style: TextStyle(color: Colors.white)),
-                );
-              }).toList(),
-        ),
-      ),
-    );
-  }
-
-  // =====================================
-  // CARD RIWAYAT
-  // =====================================
+  // ===================================== CARD RIWAYAT =====================================
   Widget _historyCard({
     required String date,
     required String masuk,
@@ -141,8 +135,8 @@ class HistoryView extends StatelessWidget {
     }
 
     return Container(
-      margin: EdgeInsets.only(bottom: 14),
-      padding: EdgeInsets.all(14),
+      margin: const EdgeInsets.only(bottom: 14),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
@@ -150,46 +144,41 @@ class HistoryView extends StatelessWidget {
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
             blurRadius: 6,
-            offset: Offset(0, 3),
+            offset: const Offset(0, 3),
           ),
         ],
       ),
       child: Row(
         children: [
-          // ICON STATUS
           CircleAvatar(
             radius: 26,
             backgroundColor: color.withOpacity(0.15),
             child: Icon(icon, color: color, size: 28),
           ),
-          SizedBox(width: 14),
-
-          // DETAIL
+          const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   date,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 14,
                     color: Colors.black87,
                   ),
                 ),
-                SizedBox(height: 6),
+                const SizedBox(height: 6),
                 Row(
                   children: [
                     _timeBox("Masuk", masuk),
-                    SizedBox(width: 10),
+                    const SizedBox(width: 10),
                     _timeBox("Pulang", pulang),
                   ],
                 ),
               ],
             ),
           ),
-
-          // STATUS TEXT
           Text(
             status,
             style: TextStyle(color: color, fontWeight: FontWeight.bold),
@@ -199,26 +188,50 @@ class HistoryView extends StatelessWidget {
     );
   }
 
-  // =====================================
-  // BOX KECIL UNTUK JAM MASUK/PULANG
-  // =====================================
+  // ===================================== BOX JAM MASUK/PULANG =====================================
   Widget _timeBox(String label, String value) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
       decoration: BoxDecoration(
         color: Colors.grey.shade100,
         borderRadius: BorderRadius.circular(6),
       ),
       child: Column(
         children: [
-          Text(label, style: TextStyle(fontSize: 10, color: Colors.black54)),
-          SizedBox(height: 2),
+          Text(
+            label,
+            style: const TextStyle(fontSize: 10, color: Colors.black54),
+          ),
+          const SizedBox(height: 2),
           Text(
             value,
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
           ),
         ],
       ),
+    );
+  }
+
+  // ===================================== SHIMMER LOADING =====================================
+  Widget _buildShimmer() {
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: 6,
+      itemBuilder: (context, index) {
+        return Shimmer.fromColors(
+          baseColor: Colors.grey.shade300,
+          highlightColor: Colors.grey.shade100,
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 14),
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(14),
+            ),
+            height: 70,
+          ),
+        );
+      },
     );
   }
 }

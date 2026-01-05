@@ -53,13 +53,15 @@ class HomeView extends GetView<HomeController> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              "Selamat Pagi,\nLamcrut",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 14,
-                              ),
-                            ),
+                            Obx(() {
+                              return Text(
+                                "Selamat Pagi,\n${controller.appController.user.value?.name ?? '...'}",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 14,
+                                ),
+                              );
+                            }),
                             SizedBox(height: 8),
                             Text(
                               "Sudah presensi hari ini?",
@@ -74,19 +76,28 @@ class HomeView extends GetView<HomeController> {
                     ),
                     const SizedBox(height: 16),
                     SizedBox(height: 16),
-                    Text(
-                      "05:12",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 48,
-                        fontWeight: FontWeight.bold,
+                    Obx(
+                      () => Text(
+                        controller.currentTime.value,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 48,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
+
                     SizedBox(height: 8),
-                    Text(
-                      "Senin, 12 Juni 2023",
-                      style: TextStyle(color: Colors.white, fontSize: 14),
+                    Obx(
+                      () => Text(
+                        controller.currentDate.value,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                        ),
+                      ),
                     ),
+
                     SizedBox(height: 16),
                     Container(
                       padding: EdgeInsets.symmetric(
@@ -101,21 +112,32 @@ class HomeView extends GetView<HomeController> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Text(
-                            "Normal",
-                            style: TextStyle(
-                              color: AppColors.BLUE_ONE,
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
+                          Obx(() {
+                            return Text(
+                              controller.appController.user.value?.position ??
+                                  '...',
+                              style: TextStyle(
+                                color: AppColors.BLUE_ONE,
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            );
+                          }),
                           SizedBox(height: 8),
-                          Text(
-                            "07:30 - 16:30",
-                            style: TextStyle(
-                              color: AppColors.BLACK_ONE,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
+                          Obx(
+                            () => Text(
+                              controller
+                                      .appController
+                                      .user
+                                      .value
+                                      ?.currentShift
+                                      ?.label ??
+                                  '-',
+                              style: TextStyle(
+                                color: AppColors.BLACK_ONE,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                           SizedBox(height: 12),
@@ -134,12 +156,20 @@ class HomeView extends GetView<HomeController> {
                                       ),
                                     ),
                                     SizedBox(height: 4),
-                                    Text(
-                                      "07:30",
-                                      style: TextStyle(
-                                        color: AppColors.TEAL_ZERO,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
+                                    Obx(
+                                      () => Text(
+                                        controller
+                                                .appController
+                                                .user
+                                                .value
+                                                ?.today
+                                                ?.checkIn ??
+                                            '-',
+                                        style: TextStyle(
+                                          color: AppColors.TEAL_ZERO,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -161,12 +191,20 @@ class HomeView extends GetView<HomeController> {
                                       ),
                                     ),
                                     SizedBox(height: 4),
-                                    Text(
-                                      "07:30",
-                                      style: TextStyle(
-                                        color: AppColors.TEAL_ZERO,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
+                                    Obx(
+                                      () => Text(
+                                        controller
+                                                .appController
+                                                .user
+                                                .value
+                                                ?.today
+                                                ?.checkOut ??
+                                            '-',
+                                        style: TextStyle(
+                                          color: AppColors.PINK_ONE,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -193,19 +231,37 @@ class HomeView extends GetView<HomeController> {
             SizedBox(height: 16),
             Container(
               padding: EdgeInsets.all(16),
-              child: GridView.count(
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                crossAxisCount: 2,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
-                childAspectRatio: 1.8, // sesuaikan proporsi
-                children: [
-                  _infoCard("Tepat Waktu", "22", Colors.blue),
-                  _infoCard("Terlambat", "3", Colors.orange),
-                  _infoCard("Pulang Cepat", "1", Colors.red),
-                  _infoCard("Total Kehadiran", "20", Colors.green),
-                ],
+              child: Obx(
+                () => GridView.count(
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                  childAspectRatio: 1.8, // sesuaikan proporsi
+                  children: [
+                    _infoCard(
+                      "Tepat Waktu",
+                      "${controller.summary.value?.onTime ?? '...'}",
+                      Colors.blue,
+                    ),
+                    _infoCard(
+                      "Terlambat",
+                      "${controller.summary.value?.late ?? '...'}",
+                      Colors.orange,
+                    ),
+                    _infoCard(
+                      "Pulang Cepat",
+                      "${controller.summary.value?.earlyLeave ?? '...'}",
+                      Colors.red,
+                    ),
+                    _infoCard(
+                      "Total Kehadiran",
+                      "${controller.summary.value?.total ?? '...'}",
+                      Colors.green,
+                    ),
+                  ],
+                ),
               ),
             ),
           ],

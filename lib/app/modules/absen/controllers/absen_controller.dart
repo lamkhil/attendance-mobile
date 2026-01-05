@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:ui' as ui;
 
+import 'package:absensi/app/data/services/attendance_services.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -122,5 +123,22 @@ class AbsenController extends GetxController {
     await captureWidget();
   }
 
-  Future<void> saveAttendance() async {}
+  Future<void> saveAttendance() async {
+    if (position.value == null || capturedWidget.value == null) {
+      Get.snackbar('Error', 'Pastikan lokasi dan foto tersedia');
+      return;
+    }
+
+    final res = await AttendanceServices.submitAttendance(
+      lat: position.value!.latitude,
+      lng: position.value!.longitude,
+      photoBytes: capturedWidget.value!,
+    );
+
+    if (res.success) {
+      Get.snackbar('Berhasil', 'Presensi berhasil');
+    } else {
+      Get.snackbar('Error', res.message ?? 'Gagal presensi');
+    }
+  }
 }

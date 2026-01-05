@@ -1,11 +1,16 @@
+import 'package:absensi/app/global/controllers/app_controller.dart';
+import 'package:absensi/app/routes/app_pages.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 
 class ProfileView extends StatelessWidget {
   const ProfileView({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final appController = Get.find<AppController>();
+
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -28,18 +33,22 @@ class ProfileView extends StatelessWidget {
                   child: Icon(Icons.person, size: 55, color: Colors.blue[800]),
                 ),
                 SizedBox(height: 12),
-                Text(
-                  "Lamcrut",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+                Obx(
+                  () => Text(
+                    appController.user.value?.name ?? '...',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 SizedBox(height: 6),
-                Text(
-                  "NIP: 1987654321",
-                  style: TextStyle(color: Colors.white70, fontSize: 14),
+                Obx(
+                  () => Text(
+                    appController.user.value?.position ?? '...',
+                    style: TextStyle(color: Colors.white70, fontSize: 14),
+                  ),
                 ),
               ],
             ),
@@ -50,34 +59,45 @@ class ProfileView extends StatelessWidget {
           // INFO CARD
           Expanded(
             child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  _infoTile("Email", "lamcrut@company.com", Icons.email),
-                  _infoTile("Jabatan", "Staff Administrasi", Icons.badge),
-                  _infoTile("Departemen", "DPMPTSP", Icons.apartment),
-                  _infoTile("Nomor HP", "0812-3456-7890", Icons.phone),
+              child: Obx(() {
+                final user = appController.user.value;
+                if (user == null) {
+                  return Center(child: CircularProgressIndicator());
+                }
 
-                  SizedBox(height: 20),
-                  // LOGOUT
-                  Padding(
-                    padding: EdgeInsets.all(20),
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        minimumSize: Size(double.infinity, 48),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                return Column(
+                  children: [
+                    _infoTile("Email", user.email, Icons.email),
+                    _infoTile("Jabatan", user.position, Icons.badge),
+                    _infoTile("Departemen", "DPMPTSP", Icons.apartment),
+                    _infoTile("Nomor HP", user.phone ?? "-", Icons.phone),
+
+                    SizedBox(height: 20),
+                    // LOGOUT
+                    Padding(
+                      padding: EdgeInsets.all(20),
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          minimumSize: Size(double.infinity, 48),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        onPressed: () {
+                          GetStorage().erase();
+                          appController.user.value = null;
+                          Get.offAllNamed(Routes.LOGIN);
+                        },
+                        child: Text(
+                          "Logout",
+                          style: TextStyle(color: Colors.white, fontSize: 16),
                         ),
                       ),
-                      onPressed: () {},
-                      child: Text(
-                        "Logout",
-                        style: TextStyle(color: Colors.white, fontSize: 16),
-                      ),
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                );
+              }),
             ),
           ),
         ],

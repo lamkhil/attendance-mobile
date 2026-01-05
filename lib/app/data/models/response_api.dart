@@ -7,13 +7,14 @@ class ResponseApi<T> {
   ResponseApi({this.data, this.pagination, this.message, this.success = true});
 
   factory ResponseApi.fromJson(
-    Map<String, dynamic> json,
-    T Function(dynamic json) fromJsonT,
-  ) {
+    Map<String, dynamic> json, {
+    Function(dynamic json)? data,
+    T? list,
+  }) {
     // Laravel paginator
     if (json.containsKey('current_page') && json.containsKey('data')) {
       return ResponseApi(
-        data: (json['data'] as List).map((e) => fromJsonT(e)).toList() as T,
+        data: list,
         pagination: PaginationMeta.fromJson(json),
         success: true,
       );
@@ -21,15 +22,12 @@ class ResponseApi<T> {
 
     // List biasa
     if (json['data'] is List) {
-      return ResponseApi(
-        data: (json['data'] as List).map((e) => fromJsonT(e)).toList() as T,
-        success: true,
-      );
+      return ResponseApi(data: list, success: true);
     }
 
     // Single object
     return ResponseApi(
-      data: json['data'] != null ? fromJsonT(json['data']) : null,
+      data: json['data'] != null ? data!(json['data']) : null,
       message: json['message'],
       success: json['success'] ?? true,
     );

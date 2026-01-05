@@ -1,4 +1,5 @@
 import 'package:absensi/app/data/models/response_api.dart';
+import 'package:absensi/app/data/models/summary.dart';
 import 'package:absensi/app/data/models/user.dart';
 import 'package:absensi/app/network/config.dart';
 import 'package:dio/dio.dart';
@@ -7,22 +8,24 @@ import 'package:get_storage/get_storage.dart';
 class Authenticationservices {
   /* ================= LOGIN ================= */
 
-  static Future<ResponseApi<void>> login(String email, String password) async {
+  static Future<ResponseApi<User>> login(String email, String password) async {
     try {
       final res = await dio.post(
         '/auth/login',
         data: {'email': email, 'password': password},
       );
+      await GetStorage().write('token', res.data['token']);
 
-      return ResponseApi<void>(
-        message: res.data['message'] ?? 'OTP telah dikirim',
+      return ResponseApi<User>.fromJson(
+        res.data,
+        data: (json) => User.fromJson(json),
       );
     } on DioException catch (e) {
-      return ResponseApi<void>.error(
+      return ResponseApi<User>.error(
         e.response?.data?['message'] ?? 'Email atau password salah',
       );
     } catch (_) {
-      return ResponseApi<void>.error('Terjadi kesalahan sistem');
+      return ResponseApi<User>.error('Terjadi kesalahan sistem');
     }
   }
 
@@ -35,11 +38,13 @@ class Authenticationservices {
         data: {'email': email, 'otp': otp},
       );
 
-      GetStorage().write('token', res.data['token']);
+      await GetStorage().write('token', res.data['token']);
+
+      print('TOKEN: ${res.data['token']}');
 
       return ResponseApi<User>.fromJson(
         res.data,
-        (json) => User.fromJson(json),
+        data: (json) => User.fromJson(json),
       );
     } on DioException catch (e) {
       return ResponseApi<User>.error(
@@ -112,7 +117,7 @@ class Authenticationservices {
 
       return ResponseApi<User>.fromJson(
         res.data,
-        (json) => User.fromJson(json),
+        data: (json) => User.fromJson(json),
       );
     } on DioException catch (e) {
       return ResponseApi<User>.error(
@@ -120,6 +125,34 @@ class Authenticationservices {
       );
     } catch (_) {
       return ResponseApi<User>.error('Gagal mengambil data user');
+    }
+  }
+
+  static Future<ResponseApi<MonthlyAttendanceSummary>> monthlySummary({
+    int? month,
+    int? year,
+  }) async {
+    try {
+      final res = await dio.get(
+        '/attendance/summary',
+        queryParameters: {
+          if (month != null) 'month': month,
+          if (year != null) 'year': year,
+        },
+      );
+
+      return ResponseApi<MonthlyAttendanceSummary>.fromJson(
+        res.data,
+        data: (json) => MonthlyAttendanceSummary.fromJson(json),
+      );
+    } on DioException catch (e) {
+      return ResponseApi<MonthlyAttendanceSummary>.error(
+        e.response?.data?['message'] ?? 'Gagal mengambil ringkasan kehadiran',
+      );
+    } catch (_) {
+      return ResponseApi<MonthlyAttendanceSummary>.error(
+        'Terjadi kesalahan sistem',
+      );
     }
   }
 }
