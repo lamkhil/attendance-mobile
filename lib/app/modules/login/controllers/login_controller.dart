@@ -1,18 +1,21 @@
+import 'package:absensi/app/data/services/authentication_services.dart';
+import 'package:absensi/app/routes/app_pages.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class LoginController extends GetxController {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+  final otpController = TextEditingController();
 
   var isLoading = false.obs;
   var obscurePassword = true.obs;
 
-  void login() async {
+  Future<void> login() async {
     if (emailController.text.isEmpty || passwordController.text.isEmpty) {
       Get.snackbar(
-        "Gagal",
-        "Email dan password wajib diisi",
+        'Gagal',
+        'Email dan password wajib diisi',
         snackPosition: SnackPosition.BOTTOM,
       );
       return;
@@ -20,17 +23,72 @@ class LoginController extends GetxController {
 
     isLoading.value = true;
 
-    // Simulasi proses login
-    await Future.delayed(const Duration(seconds: 2));
+    final res = await Authenticationservices.login(
+      emailController.text,
+      passwordController.text,
+    );
 
     isLoading.value = false;
 
-    // Cek dummy login
-    if (emailController.text == "123" && passwordController.text == "123") {
-      Get.offAllNamed('/home');
-      Get.snackbar("Berhasil", "Login sukses!");
-    } else {
-      Get.snackbar("Login gagal", "Email atau password salah");
+    if (!res.success) {
+      Get.snackbar('Gagal', res.message ?? '');
+      return;
     }
+
+    _showOtpDialog();
+  }
+
+  /* ================= OTP DIALOG ================= */
+
+  void _showOtpDialog() {
+    otpController.clear();
+
+    Get.dialog(
+      AlertDialog(
+        title: const Text('Verifikasi OTP'),
+        content: TextField(
+          controller: otpController,
+          keyboardType: TextInputType.number,
+          maxLength: 6,
+          decoration: const InputDecoration(
+            hintText: 'Masukkan OTP',
+            counterText: '',
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Get.back(), child: const Text('Batal')),
+          ElevatedButton(onPressed: verifyOtp, child: const Text('Verifikasi')),
+        ],
+      ),
+      barrierDismissible: false,
+    );
+  }
+
+  /* ================= VERIFY OTP ================= */
+
+  Future<void> verifyOtp() async {
+    if (otpController.text.length < 4) {
+      Get.snackbar('Gagal', 'OTP tidak valid');
+      return;
+    }
+
+    isLoading.value = true;
+
+    final res = await Authenticationservices.verifyOtp(
+      emailController.text,
+      otpController.text,
+    );
+
+    isLoading.value = false;
+
+    if (!res.success) {
+      Get.snackbar('Gagal', res.message ?? '');
+      return;
+    }
+
+    Get.back(); // tutup dialog
+    Get.offAllNamed(Routes.HOME);
+
+    Get.snackbar('Berhasil', 'Login berhasil');
   }
 }

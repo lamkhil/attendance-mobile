@@ -11,16 +11,17 @@ class LoginView extends GetView<LoginController> {
       backgroundColor: const Color(0xFFF3F4F6),
       body: Stack(
         children: [
-          ColorFiltered(
-            colorFilter: ColorFilter.mode(
-              Colors.black.withOpacity(0.4), // ubah 0.4 → 0.6 untuk lebih gelap
-              BlendMode.darken,
-            ),
-            child: Image.asset(
-              'assets/bg.jpg',
-              height: MediaQuery.of(context).size.height,
-              width: MediaQuery.of(context).size.width,
-              fit: BoxFit.cover,
+          SizedBox(
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height,
+            child: ColorFiltered(
+              colorFilter: ColorFilter.mode(
+                Colors.black.withOpacity(
+                  0.4,
+                ), // ubah 0.4 → 0.6 untuk lebih gelap
+                BlendMode.darken,
+              ),
+              child: Image.asset('assets/bg.jpg', fit: BoxFit.cover),
             ),
           ),
           Center(
