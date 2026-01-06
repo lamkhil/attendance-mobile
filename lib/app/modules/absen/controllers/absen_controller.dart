@@ -3,6 +3,8 @@ import 'dart:io';
 import 'dart:ui' as ui;
 
 import 'package:absensi/app/data/services/attendance_services.dart';
+import 'package:absensi/app/routes/app_pages.dart';
+import 'package:absensi/app/widgets/dialog.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -129,13 +131,17 @@ class AbsenController extends GetxController {
       return;
     }
 
+    AppDialog.loading();
+
     final res = await AttendanceServices.submitAttendance(
       lat: position.value!.latitude,
       lng: position.value!.longitude,
       photoBytes: capturedWidget.value!,
     );
+    Get.back();
 
     if (res.success) {
+      Get.offAllNamed(Routes.HOME);
       Get.snackbar('Berhasil', 'Presensi berhasil');
     } else {
       Get.snackbar('Error', res.message ?? 'Gagal presensi');

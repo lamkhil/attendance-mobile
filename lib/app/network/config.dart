@@ -6,7 +6,7 @@ import 'interceptor/NetworkInterceptor.dart';
 final Dio dio =
     Dio(
         BaseOptions(
-          baseUrl: 'https://parkir.dpmptsp-surabaya.my.id/api',
+          baseUrl: 'https://attendance.dpmptsp-surabaya.my.id/api',
           headers: {
             "Content-Type": "application/json",
             "Accept": "application/json",
