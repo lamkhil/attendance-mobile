@@ -16,7 +16,7 @@ Future<void> main() async {
   // 🔴 INI YANG WAJIB
   await initializeDateFormatting('id_ID', null);
   await GetStorage.init();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  //await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const MyApp());
 }
 
