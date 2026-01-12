@@ -1,5 +1,6 @@
 import 'package:absensi/app/data/models/user.dart';
 import 'package:absensi/app/data/services/authentication_services.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
@@ -15,6 +16,17 @@ class AppController extends GetxController {
         Get.snackbar('Oops!', "Failed to fetch user data. Please login again.");
       }
     }
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
+
+    NotificationSettings settings = await messaging.requestPermission(
+      alert: true,
+      announcement: false,
+      badge: true,
+      carPlay: false,
+      criticalAlert: false,
+      provisional: false,
+      sound: true,
+    );
   }
 
   @override

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "746800149870",
+    "project_id": "attendance-dpmptsp",
+    "storage_bucket": "attendance-dpmptsp.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:746800149870:android:7035e2db35d559ef3afd7f",
+        "android_client_info": {
+          "package_name": "id.go.surabaya.dpmptsp.absensi"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAMwEtf5EwJY2d-aLO0D0QdhR6JlmFxtMY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

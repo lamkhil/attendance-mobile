@@ -1,4 +1,6 @@
 import 'package:absensi/app/global/bindings/app_binding.dart';
+import 'package:absensi/firebase_options.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_web_frame/flutter_web_frame.dart';
@@ -14,6 +16,7 @@ Future<void> main() async {
   // 🔴 INI YANG WAJIB
   await initializeDateFormatting('id_ID', null);
   await GetStorage.init();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const MyApp());
 }
 
