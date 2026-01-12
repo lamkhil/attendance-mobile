@@ -1,3 +1,4 @@
+import 'package:absensi/app/data/models/attendance.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shimmer/shimmer.dart';
@@ -45,11 +46,16 @@ class HistoryView extends GetView<HistoryController> {
                   itemBuilder: (context, index) {
                     if (index < attendances.length) {
                       final a = attendances[index];
-                      return _historyCard(
-                        date: a.dateFormatted,
-                        masuk: a.checkInFormatted,
-                        pulang: a.checkOutFormatted,
-                        status: a.statusText,
+                      return InkWell(
+                        onTap: () {
+                          _showPhotoPopup(context, a);
+                        },
+                        child: _historyCard(
+                          date: a.dateFormatted,
+                          masuk: a.checkInFormatted,
+                          pulang: a.checkOutFormatted,
+                          status: a.statusText,
+                        ),
                       );
                     } else {
                       return controller.canLoadMore
@@ -99,6 +105,122 @@ class HistoryView extends GetView<HistoryController> {
           ),
         ],
       ),
+    );
+  }
+
+  void _showPhotoPopup(BuildContext context, Attendance a) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) {
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, 30),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // ===== HEADER =====
+              Center(
+                child: Container(
+                  width: 50,
+                  height: 5,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Center(
+                child: Text(
+                  a.dateFormatted,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              // ===== FOTO CHECK IN =====
+              _photoSection(
+                title: "Foto Check In",
+                time: a.checkInFormatted,
+                photoUrl: a.checkInPhoto,
+              ),
+
+              const SizedBox(height: 20),
+
+              // ===== FOTO CHECK OUT =====
+              _photoSection(
+                title: "Foto Check Out",
+                time: a.checkOutFormatted,
+                photoUrl: a.checkOutPhoto,
+              ),
+
+              const SizedBox(height: 10),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _photoSection({
+    required String title,
+    required String time,
+    String? photoUrl,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Text(
+              title,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+            ),
+            const Spacer(),
+            Text(
+              time,
+              style: const TextStyle(color: Colors.black54, fontSize: 12),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+
+        ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            height: 180,
+            width: double.infinity,
+            color: Colors.grey.shade100,
+            child: photoUrl == null || photoUrl.isEmpty
+                ? const Center(
+                    child: Text(
+                      "Tidak ada foto",
+                      style: TextStyle(color: Colors.black54),
+                    ),
+                  )
+                : Image.network(
+                    photoUrl,
+                    fit: BoxFit.cover,
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return const Center(child: CircularProgressIndicator());
+                    },
+                    errorBuilder: (context, error, stackTrace) {
+                      return const Center(
+                        child: Icon(Icons.broken_image, size: 40),
+                      );
+                    },
+                  ),
+          ),
+        ),
+      ],
     );
   }
 
