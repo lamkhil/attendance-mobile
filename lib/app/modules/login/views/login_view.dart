@@ -140,11 +140,11 @@ class LoginView extends GetView<LoginController> {
                         TextButton(
                           onPressed: () => Get.snackbar(
                             "Info",
-                            "Fitur register belum tersedia",
+                            "Fitur lupa password belum tersedia",
                             snackPosition: SnackPosition.BOTTOM,
                           ),
                           child: const Text(
-                            "Belum punya akun? Daftar",
+                            "Lupa Password",
                             style: TextStyle(color: Colors.blueAccent),
                           ),
                         ),

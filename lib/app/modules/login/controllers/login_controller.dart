@@ -3,6 +3,7 @@ import 'package:absensi/app/global/controllers/app_controller.dart';
 import 'package:absensi/app/routes/app_pages.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 
 class LoginController extends GetxController {
   final emailController = TextEditingController();
@@ -37,7 +38,14 @@ class LoginController extends GetxController {
     }
 
     Get.find<AppController>().user.value = res.data;
-    Get.offAllNamed(Routes.HOME);
+    if (GetStorage().read('token') != null) {
+      Get.offAllNamed(Routes.HOME);
+    } else {
+      Get.snackbar(
+        'Oops!',
+        res.message ?? "Gagal generate token, mohon coba lagi!",
+      );
+    }
     // _showOtpDialog();
   }
 

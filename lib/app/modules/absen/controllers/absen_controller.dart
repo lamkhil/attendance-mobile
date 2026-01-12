@@ -12,6 +12,7 @@ import 'package:flutter/rendering.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:image/image.dart' as img;
 
 class AbsenController extends GetxController {
   CameraController? cameraController;
@@ -132,12 +133,24 @@ class AbsenController extends GetxController {
     }
 
     AppDialog.loading();
+    Get.snackbar(
+      'Mohon Tunggu...',
+      'Memproses Foto',
+      duration: const Duration(seconds: 3),
+    );
+
+    final compressedPhoto = await compressAndResize(
+      capturedWidget.value!,
+      quality: 70,
+    );
+    Get.snackbar('Mohon Tunggu...', 'Mengunggah Foto');
 
     final res = await AttendanceServices.submitAttendance(
       lat: position.value!.latitude,
       lng: position.value!.longitude,
-      photoBytes: capturedWidget.value!,
+      photoBytes: compressedPhoto,
     );
+
     Get.back();
 
     if (res.success) {
@@ -146,5 +159,19 @@ class AbsenController extends GetxController {
     } else {
       Get.snackbar('Error', res.message ?? 'Gagal presensi');
     }
+  }
+
+  Future<Uint8List> compressAndResize(
+    Uint8List bytes, {
+    int quality = 70,
+    int maxWidth = 1024,
+  }) async {
+    final image = img.decodeImage(bytes);
+    if (image == null) return bytes;
+
+    final resized = img.copyResize(image, width: maxWidth);
+
+    final compressed = img.encodeJpg(resized, quality: quality);
+    return Uint8List.fromList(compressed);
   }
 }

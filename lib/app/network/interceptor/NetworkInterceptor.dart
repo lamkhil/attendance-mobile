@@ -31,7 +31,6 @@ class NetworkInterceptor extends Interceptor {
     if ((response.data['message'] ?? '').toString().contains(
       'Unauthenticated',
     )) {
-      GetStorage().remove('token');
       getx.Get.offAllNamed(Routes.LOGIN);
     }
     return super.onResponse(response, handler);
