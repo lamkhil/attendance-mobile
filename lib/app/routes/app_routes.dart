@@ -10,6 +10,7 @@ abstract class Routes {
   static const PROFILE = _Paths.PROFILE;
   static const HISTORY = _Paths.HISTORY;
   static const LOKAKARYA = _Paths.LOKAKARYA;
+  static const ATTENDANCE_MOD = _Paths.ATTENDANCE_MOD;
 }
 
 abstract class _Paths {
@@ -21,4 +22,5 @@ abstract class _Paths {
   static const PROFILE = '/profile';
   static const HISTORY = '/history';
   static const LOKAKARYA = '/';
+  static const ATTENDANCE_MOD = '/attendance-mod';
 }

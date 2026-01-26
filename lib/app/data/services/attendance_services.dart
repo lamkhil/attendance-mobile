@@ -61,12 +61,50 @@ class AttendanceServices {
         }),
       );
 
-      final photoUrl = uploadRes.data['url'] as String;
+      final photo = uploadRes.data['path'] as String;
 
       // 2️⃣ Kirim log ke /attendance/action
       final res = await dio.post(
         '/attendance/action',
-        data: {'lat': lat, 'lng': lng, 'photo': photoUrl},
+        data: {'lat': lat, 'lng': lng, 'photo': photo},
+      );
+
+      return ResponseApi<void>(
+        message: res.data['success'] == true
+            ? 'Presensi berhasil'
+            : 'Gagal presensi',
+        success: res.data['success'] == true,
+      );
+    } on DioException catch (e) {
+      return ResponseApi<void>.error(
+        e.response?.data['message'] ?? 'Gagal mengirim presensi',
+      );
+    } catch (_) {
+      return ResponseApi<void>.error('Terjadi kesalahan sistem');
+    }
+  }
+
+  static Future<ResponseApi<void>> submitAttendance2({
+    required double lat,
+    required double lng,
+    required Uint8List photoBytes,
+    required String datetime,
+  }) async {
+    try {
+      // 1️⃣ Upload photo ke /upload
+      final uploadRes = await dio.post(
+        '/upload',
+        data: FormData.fromMap({
+          'file': MultipartFile.fromBytes(photoBytes, filename: 'absen.png'),
+        }),
+      );
+
+      final photo = uploadRes.data['path'] as String;
+
+      // 2️⃣ Kirim log ke /attendance/action
+      final res = await dio.post(
+        '/attendance/action2',
+        data: {'lat': lat, 'lng': lng, 'photo': photo, 'datetime': datetime},
       );
 
       return ResponseApi<void>(

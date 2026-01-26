@@ -2,6 +2,8 @@ import 'package:get/get.dart';
 
 import '../modules/absen/bindings/absen_binding.dart';
 import '../modules/absen/views/absen_view.dart';
+import '../modules/attendance-mod/bindings/attendance_mod_binding.dart';
+import '../modules/attendance-mod/views/attendance_mod_view.dart';
 import '../modules/history/bindings/history_binding.dart';
 import '../modules/history/views/history_view.dart';
 import '../modules/home/bindings/home_binding.dart';
@@ -58,14 +60,9 @@ class AppPages {
       binding: SplashscreenBinding(),
     ),
     GetPage(
-      name: _Paths.LOKAKARYA,
-      page: () => const LokakaryaView(),
-      binding: LokakaryaBinding(),
-    ),
-    GetPage(
-      name: "${_Paths.LOKAKARYA}/:id",
-      page: () => const LokakaryaView(),
-      binding: LokakaryaBinding(),
+      name: _Paths.ATTENDANCE_MOD,
+      page: () => const AttendanceModView(),
+      binding: AttendanceModBinding(),
     ),
   ];
 }
